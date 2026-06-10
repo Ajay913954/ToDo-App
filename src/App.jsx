@@ -15,6 +15,7 @@ export default function App() {
     );
   });
 
+  // Dark Mode Save
   useEffect(() => {
     localStorage.setItem(
       "darkMode",
@@ -22,6 +23,7 @@ export default function App() {
     );
   }, [darkMode]);
 
+  // Load Todos
   useEffect(() => {
     const savedTodos =
       JSON.parse(localStorage.getItem("todos")) || [];
@@ -29,6 +31,7 @@ export default function App() {
     setTodos(savedTodos);
   }, []);
 
+  // Save Todos
   useEffect(() => {
     localStorage.setItem(
       "todos",
@@ -52,7 +55,7 @@ export default function App() {
 
     const newTodo = {
       id: Date.now(),
-      text: input,
+      text: input.trim(),
       isCompleted: false,
       createdAt: new Date().toLocaleString(),
     };
@@ -61,12 +64,15 @@ export default function App() {
       ...prevTodos,
       newTodo,
     ]);
+
     setInput("");
   };
 
   const deleteTask = (id) => {
-    setTodos(
-      todos.filter((todo) => todo.id !== id)
+    setTodos((prevTodos) =>
+      prevTodos.filter(
+        (todo) => todo.id !== id
+      )
     );
   };
 
@@ -78,36 +84,38 @@ export default function App() {
   const saveTask = (id) => {
     if (!editText.trim()) return;
 
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id
-        ? {
-          ...todo,
-          text: editText,
-        }
-        : todo
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id
+          ? {
+            ...todo,
+            text: editText.trim(),
+          }
+          : todo
+      )
     );
 
-    setTodos(updatedTodos);
     setEditId(null);
     setEditText("");
   };
 
   const toggleComplete = (id) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id
-        ? {
-          ...todo,
-          isCompleted: !todo.isCompleted,
-        }
-        : todo
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id
+          ? {
+            ...todo,
+            isCompleted:
+              !todo.isCompleted,
+          }
+          : todo
+      )
     );
-
-    setTodos(updatedTodos);
   };
 
   const clearCompleted = () => {
-    setTodos(
-      todos.filter(
+    setTodos((prevTodos) =>
+      prevTodos.filter(
         (todo) => !todo.isCompleted
       )
     );
@@ -149,6 +157,7 @@ export default function App() {
       <h1>✅ ToDo App</h1>
 
       <button
+        className="theme-btn"
         onClick={() =>
           setDarkMode(!darkMode)
         }
@@ -167,7 +176,7 @@ export default function App() {
       <div className="input-group">
         <input
           type="text"
-          placeholder="Enter Your Task"
+          placeholder="Enter Your Task..."
           value={input}
           onChange={(e) =>
             setInput(e.target.value)
@@ -202,7 +211,9 @@ export default function App() {
               ? "active-filter"
               : ""
           }
-          onClick={() => setFilter("all")}
+          onClick={() =>
+            setFilter("all")
+          }
         >
           All
         </button>
@@ -242,7 +253,7 @@ export default function App() {
 
       {filteredTodos.length === 0 && (
         <p className="empty">
-          No tasks found 🔍❓
+          No tasks found 🔍
         </p>
       )}
 
@@ -267,30 +278,33 @@ export default function App() {
                     )
                   }
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (
+                      e.key === "Enter"
+                    ) {
                       saveTask(todo.id);
                     }
                   }}
                 />
 
                 <button
-                  onClick={() =>
-                    saveTask(todo.id)
-                  }
+                  style={{
+                    background: "#22c55e",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 16px",
+                    borderRadius: "10px",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => saveTask(todo.id)}
                 >
                   Save
                 </button>
               </>
             ) : (
               <>
-                <div
-                  style={{
-                    flex: 1,
-                  }}
-                >
+                <div className="todo-content">
                   <span
                     style={{
-                      display: "block",
                       textDecoration:
                         todo.isCompleted
                           ? "line-through"
@@ -304,28 +318,32 @@ export default function App() {
                     {todo.text}
                   </span>
 
-                  <small>
-                    {todo.createdAt}
+                  <small className="date">
+                    📅 {todo.createdAt}
                   </small>
                 </div>
 
-                <button
-                  onClick={() =>
-                    editTask(todo)
-                  }
-                >
-                  Edit
-                </button>
+                <div className="action-buttons">
+                  <button
+                    onClick={() =>
+                      editTask(todo)
+                    }
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      deleteTask(
+                        todo.id
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+                </div>
               </>
             )}
-
-            <button
-              onClick={() =>
-                deleteTask(todo.id)
-              }
-            >
-              Delete
-            </button>
           </li>
         ))}
       </ul>

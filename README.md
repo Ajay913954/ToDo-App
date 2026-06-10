@@ -55,12 +55,6 @@ https://todo-by-ajay.vercel.app
 
 ---
 
-## 📷 Preview
-
-![ToDo App Screenshot](./screenshot.png)
-
----
-
 ## 🧠 React Concepts Used
 
 ### React Hooks
